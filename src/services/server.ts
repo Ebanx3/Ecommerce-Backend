@@ -6,13 +6,16 @@ import session from "express-session";
 import config from "../config";
 import helmet from "helmet";
 import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+import { onConnection } from "../messages/websockets";
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
-
+app.use(express.static("public"));
 const ttlSeconds = 60 * 10;
 
 app.use(
@@ -32,6 +35,11 @@ app.use(passport.session());
 passport.use("login", loginFunc);
 passport.use("signup", signupFunc);
 
+const myServer = http.createServer(app);
+export const io = new Server(myServer, { cors: {} });
+
+io.on("connection", onConnection);
+
 app.use("/api", mainRouter);
 
 app.use((req, res) => {
@@ -41,5 +49,5 @@ app.use((req, res) => {
 });
 
 export const initServer = (port: number) => {
-  app.listen(port, () => {});
+  myServer.listen(port);
 };

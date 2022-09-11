@@ -4,6 +4,8 @@ import { UserModel } from "../users/users.model";
 import { Request } from "express";
 //import NotifyNewUserEmail
 
+export let userId = "";
+
 const login = async (
   req: Request,
   username: string,
@@ -18,6 +20,7 @@ const login = async (
   if (!samePass) {
     return done(null, false, { data: "Invalid password" });
   }
+  userId = user._id.toString();
   return done(null, user);
 };
 
@@ -28,13 +31,15 @@ const signup = async (
   done: any
 ) => {
   try {
-    const { email, password, name, phone, admin } = req.body;
+    const { email, password, name, phone, admin, adress } = req.body;
+    console.log(req.body);
     const adm = admin != undefined;
     const newUser = await UserModel.create({
       email,
       password,
       name,
       phone,
+      adress,
       admin: adm,
     });
     return done(null, newUser);

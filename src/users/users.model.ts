@@ -14,6 +14,7 @@ export interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
   admin: boolean;
+  adress: string;
   isValidPassword(password: string): Promise<boolean>;
 }
 
@@ -23,6 +24,7 @@ const UserSchema = new Schema<UserDoc>(
     phone: { type: Number, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    adress: { type: String, required: true },
     admin: { type: Boolean, default: false },
   },
   {
