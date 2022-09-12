@@ -38,7 +38,7 @@ router.post("/signup", async (req, res, next) => {
 });
 
 router.get("/loginError", (req, res) => {
-  res.json({
+  res.status(401).json({
     data: "Invalid email or password",
   });
 });

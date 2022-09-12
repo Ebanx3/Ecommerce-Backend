@@ -1,0 +1,538 @@
+openapi: 3.0.0
+info:
+  title: Ecommerce Backend CH
+  description: Simulador de e-commerce, proyecto para el curso Backend de CoderHouse.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Servidor local
+  - url: http://acaIriaHeroku
+    description: Optional server description, e.g. Internal staging server for testing
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - stock
+        - description
+        - categoryId
+      properties:
+        id:
+          type: string
+          description: identificador de cada producto
+        name:
+          type: string
+          description: Nombre del producto
+        price:
+          type: number
+          description: precio del producto
+        stock:
+          type: number
+          description: stock actual del producto
+        description:
+          type: string
+          description: descripcion del producto
+        categoryId:
+          type: string
+          description: identificador de la categoria en base de datos
+      example:
+        id: 630f553a75eeee117b8a4f9c
+        name: termito
+        price: 2000
+        stock: 30
+        description: termo spanley
+        categoryId: 630f551d75eeee117b8a4f99
+    Categories:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: Id único para cada categoría
+        name:
+          type: string
+          description: Nombre de la categpría
+      example:
+        id: 6s5d4asd6as8da4d656a5d4
+        name: Electrodomesticos
+paths:
+  /api/users/login:
+    post:
+      summary: Login
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              email: esteban@gmail.com
+              password: asdasd
+      description: Verifica la información y permite loguearse
+      responses:
+        "200":
+          description: Logueo autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "401":
+          description: Login no autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/users/signup:
+    post:
+      summary: Signup
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: number
+                adress:
+                  type: string
+                admin:
+                  type: boolean
+            example:
+              email: esteban@gmail.com
+              password: asdasd
+              name: Esteban
+              phone: 54955412561
+              adress: home 1212
+              admin: false
+      description: Permite registrarse en el sitio
+      responses:
+        "200":
+          description: Logueo autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "400":
+          description: Email ya usado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "401":
+          description: Body no valido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/users/logout:
+    post:
+      summary: Logout
+      tags:
+        - Users
+      description: Permite desloguear al usuario y destruye la session
+      responses:
+        "200":
+          description: Deslogueo correcto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/categories:
+    get:
+      summary: Get all categories
+      tags:
+        - Categories
+      description: Devuelve las categorías
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Categories"
+    post:
+      summary: Create category
+      tags:
+        - Categories
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            example:
+              name: Electrodomesticos
+
+      description: Permite crear una nueva categoría
+      responses:
+        "200":
+          description: Categoría creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+        "400":
+          description: Invalid body, name field is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/categories/{categoryId}:
+    get:
+      summary: Consigue una categoría
+      tags:
+        - Categories
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: Id de la categoría a la que hacemos referencia
+          schema:
+            type: string
+      description: Devuelve la categoría que corresponde al Id
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Categories"
+
+        "400":
+          description: Categoría no encontrada, id no válido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+    put:
+      summary: Modifica una categoría
+      tags:
+        - Categories
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: Id de la categoría a la que hacemos referencia
+          schema:
+            type: string
+      description: Modifica la categoría que corresponde al Id
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            example:
+              name: Electrodomesticos
+      responses:
+        "200":
+          description: Categoría actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "400":
+          description: categoría no encontrada, o body no válido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+    delete:
+      summary: Elimina una categoría por ID
+      tags:
+        - Categories
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: Id de la categoría a la que hacemos referencia
+          schema:
+            type: string
+      description: Elimina la categoría que corresponde al Id
+      responses:
+        "200":
+          description: Categoría eliminada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/products/:
+    get:
+      summary: Consigue todos los productos
+      tags:
+        - Products
+      description: Devuelve los productos
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+        "400":
+          description: No se pudo conseguir los productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+    post:
+      summary: Crea un nuevo producto
+      tags:
+        - Products
+      description: Crea un nuevo producto
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: identificador de cada producto
+                name:
+                  type: string
+                  description: Nombre del producto
+                price:
+                  type: number
+                  description: precio del producto
+                stock:
+                  type: number
+                  description: stock actual del producto
+                description:
+                  type: string
+                  description: descripcion del producto
+                categoryId:
+                  type: string
+                  description: identificador de la categoria en base de datos
+              example:
+                id: 630f553a75eeee117b8a4f9c
+                name: termito
+                price: 2000
+                stock: 30
+                description: termo spanley
+                categoryId: 630f551d75eeee117b8a4f99
+
+      responses:
+        "200":
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "400":
+          description: Invalid body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/products/{productId}:
+    get:
+      summary: Consigue el producto del id
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Id del producto al que hacemos referencia
+          schema:
+            type: string
+      description: Devuelve el producto que corresponde al Id
+
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Product"
+
+        "400":
+          description: Id no valido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+    put:
+      summary: Modifica un producto
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Id del producto al que hacemos referencia
+          schema:
+            type: string
+      description: Modifica el producto que corresponde al Id
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                stock:
+                  type: number
+                description:
+                  type: string
+                categoryId:
+                  type: string
+              example:
+                stock: 0
+                price: 1000
+
+      responses:
+        "200":
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "400":
+          description: Body vacío, o id invalido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+    delete:
+      summary: Elimina un producto por ID
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Id del producto al que hacemos referencia
+          schema:
+            type: string
+      description: Elimina el producto que corresponde al Id
+      responses:
+        "200":
+          description: Producto eliminad0
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string

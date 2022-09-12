@@ -9,6 +9,9 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import { onConnection } from "../messages/websockets";
+import path from "path";
+import YAML from "yamljs";
+import swaggerUi from "swagger-ui-express";
 
 const app = express();
 
@@ -34,6 +37,11 @@ app.use(passport.session());
 
 passport.use("login", loginFunc);
 passport.use("signup", signupFunc);
+
+const swaggerPath = path.resolve(process.cwd(), "./swagger.yml");
+const swaggerDoc = YAML.load(swaggerPath);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 const myServer = http.createServer(app);
 export const io = new Server(myServer, { cors: {} });
