@@ -120,7 +120,6 @@ const submitCart = async (req: Request, res: Response) => {
       data: resu,
     });
   } catch (err: any) {
-    console.log(err.message);
     errorLogger(err.message);
   }
 };

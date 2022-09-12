@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ProductsModel } from "../products/products.model";
 import { errorLogger } from "../services/logs";
+import { notifyByEmail } from "../services/notifications";
 import { OrdersModel } from "./oders.model";
 import ordersDTO from "./orders.DTO";
 
@@ -44,7 +45,12 @@ const completeOrder = async (req: Request, res: Response) => {
       });
       return;
     }
-    await OrdersModel.findByIdAndUpdate(orderId, { state: "complete" });
+    const orderCompl = await OrdersModel.findByIdAndUpdate(
+      orderId,
+      { state: "complete" },
+      { new: true }
+    );
+    notifyByEmail(orderCompl, "OrderComplete");
     res.status(200).json({
       data: "Order complete!",
     });
@@ -94,10 +100,11 @@ export const createOrder = async (userId: string, products: any[]) => {
       items: prodArray,
       totalPrice,
     };
-    await OrdersModel.create(newOrder);
+
+    const newOrd = await OrdersModel.create(newOrder);
+    notifyByEmail(newOrd, "newOrder");
     return "Orders created successfully";
   } catch (err: any) {
-    console.log(err.message);
     errorLogger(err.message);
     return "Failed to create order";
   }
