@@ -61,6 +61,28 @@ components:
       example:
         id: 6s5d4asd6as8da4d656a5d4
         name: Electrodomesticos
+    Cart:
+      type: object
+      required:
+        - id
+        - userId
+        - products
+      properties:
+        id:
+          type: string
+          description: Id del carrito
+        userId:
+          type: string
+          description: Id del usuario vinculado al carrito
+        products:
+          type: array
+          items:
+            properties:
+              productId:
+                type: string
+              amount:
+                type: number
+
 paths:
   /api/users/login:
     post:
@@ -528,7 +550,130 @@ paths:
       description: Elimina el producto que corresponde al Id
       responses:
         "200":
-          description: Producto eliminad0
+          description: Producto eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/cart/:
+    get:
+      summary: Consigue los productos del carrito
+      tags:
+        - Cart
+      description: Consigue el carrito de un usuario, necesita estar logueado
+
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Cart"
+        "401":
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/cart/add:
+    post:
+      summary: Agrega un producto al carrito
+      tags:
+        - Cart
+      description: Agrega el producto pasado en el body al carrito
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                amount:
+                  type: number
+
+      responses:
+        "200":
+          description: Producto agregado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "401":
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+        "400":
+          description: Id de producto no valido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+  /api/cart/remove:
+    post:
+      summary: Agrega un producto al carrito
+      tags:
+        - Cart
+      description: Agrega el producto pasado en el body al carrito
+      requestBody:
+        required: true
+        content:
+          aplication/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                amount:
+                  type: number
+
+      responses:
+        "200":
+          description: Producto agregado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+
+        "401":
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+        "400":
+          description: Id de producto no valido
           content:
             application/json:
               schema:
